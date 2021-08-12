@@ -6,6 +6,7 @@ const DevServer = require('webpack-dev-server');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
+const ImageMinimizerPlugin = require('image-minimizer-webpack-plugin');
 
 const srcDir = join(__dirname, 'src');
 const distDir = join(__dirname, 'docs');
@@ -43,6 +44,11 @@ const configs = sims.map(sim => ({
     minimizer: [`...`, new CssMinimizerPlugin()],
   },
   plugins: [
+    new ImageMinimizerPlugin({
+      minimizerOptions: {
+        plugins: ['svgo'],
+      },
+    }),
     new MiniCssExtractPlugin({ filename: 'assets/style.css' }),
     new HtmlWebpackPlugin({
       inject: 'head',
