@@ -58,11 +58,16 @@ const configs = sims.map(sim => ({
     }),
   ],
   output: {
-    filename: 'assets/[name].js',
+    filename: 'assets/bundle.js',
     assetModuleFilename: 'assets/[name][ext][query]',
     path: join(distDir, sim),
     clean: true,
     publicPath: './',
+  },
+  devServer: {
+    contentBase: join(srcDir, sim),
+    contentBasePublicPath: 'assets',
+    compress: true,
   },
   devtool: 'source-map',
   mode: 'production',
@@ -83,7 +88,10 @@ function webpackCompile(config, cb) {
 function webpackWatch(config, cb) {
   // if (config.devtool) config.devtool = 'eval-source-map';  // Enable this for faster dev builds but css sourcemaps will not work
   if (config.mode) config.mode = 'development';
-  new DevServer(webpack(config)).listen(3000, '0.0.0.0', err =>
-    err ? console.error(err) : console.log('Development server is running at port 3000')
+  new DevServer(webpack(config)).listen(
+    3000,
+    '0.0.0.0',
+    err => (err ? console.error(err) : console.log('Development server is running at port 3000')),
+    config.devServer
   );
 }

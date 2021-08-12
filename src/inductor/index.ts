@@ -111,9 +111,9 @@ voltageInp.id = 'voltage';
 voltageInp.type = 'range';
 voltageInp.max = voltageMax as unknown as string;
 voltageInp.min = -voltageMax as unknown as string;
-voltageInp.step = '0.2';
+voltageInp.step = '0.1';
 voltageInp.value = '0';
-voltageInp.oninput = ev => (voltage = +(volEl.innerText = voltageInp.value));
+voltageInp.oninput = ev => (volEl.innerText = (voltage = +voltageInp.value).toFixed(1));
 controls.append(voltageInp, br());
 
 // Appending generate sine
