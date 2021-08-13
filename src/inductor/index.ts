@@ -24,7 +24,12 @@ let generateSine: boolean = false;
 let generatorStartTS: number | null = null;
 let previousTS: number = 0;
 
-const wheelEl = document.getElementById('flywheel')!;
+// Adding wheel element
+const wheelEl = document.createElement('img');
+wheelEl.id = 'flywheel';
+wheelEl.src = require('./flywheel.svg');
+document.getElementById('view')!.append(wheelEl);
+
 const changeGenerateSine = (checked: boolean) => {
   generatorStartTS = null;
   currentIntegral = 0;
