@@ -32,9 +32,12 @@ const configs = sims.map(sim => ({
         test: /\.(png|svg|jpg|jpeg|gif)$/i,
         type: 'asset/resource',
       },
-
       {
         test: /\.(woff|woff2|eot|ttf|otf)$/i,
+        type: 'asset/resource',
+      },
+      {
+        test: /\.(wasm)$/i,
         type: 'asset/resource',
       },
     ],
@@ -66,7 +69,6 @@ const configs = sims.map(sim => ({
   },
   devServer: {
     contentBase: join(srcDir, sim),
-    contentBasePublicPath: 'assets',
     compress: true,
   },
   devtool: 'source-map',
