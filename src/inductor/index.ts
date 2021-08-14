@@ -18,7 +18,7 @@ const controls = {
 // Constants
 const sineWaveFrequency = 0.2; // in Hertz (Hz)
 const sineWaveAngularVelocity = 2 * Math.PI * sineWaveFrequency; // in rad/sec as ω=2πf
-const initialInductorCurrent = () => -voltageMax / (controls.Inductance * sineWaveAngularVelocity); // as -I₀=-E₀/Lω
+const initialInductorCurrent = () => -(voltageMax / (controls.Inductance * sineWaveAngularVelocity)); // as -I₀=-E₀/Lω
 const angularVelocityCurrentRatio = 1;
 const integrateResistorCurrent = (delta: number) => controls.Voltage / controls.Resistance; // as V=iR
 const integrateInductorCurrent = (delta: number) => (currentIntegral += (delta * controls.Voltage) / controls.Inductance); // as V=-L(di/dt)
@@ -52,7 +52,6 @@ const changeGenerateSine = (checked: boolean) => {
 };
 
 const changeCircuitType = (loadt: typeof loadtype) => {
-  currentIntegral = 0;
   loadtype = loadt;
   if (generateSine) changeGenerateSine(true);
   switch (loadt) {
@@ -181,7 +180,7 @@ function createControl(name: keyof typeof controls, max: number, min: number, un
   contorlEL.min = min + '';
   contorlEL.step = '0.1';
   contorlEL.id = name;
-  const change = (value: number) => (contorlEL.value = (controls[name] = value).toFixed(visiblePercision));
+  const change = (value: number) => (valueEl.innerText = ((<any>contorlEL).value = controls[name] = value).toFixed(visiblePercision));
   change(controls[name]);
   contorlEL.oninput = ev => (valueEl.innerText = (controls[name] = +contorlEL.value).toFixed(visiblePercision));
   return { nodes: [labelEl, br(), contorlEL, br()], change };
