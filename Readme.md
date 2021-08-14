@@ -1,6 +1,6 @@
 # Simulations
 
-This git repository 
+This git repository has some simulations to learn physics visually
 
 ## Build Instructions
 
@@ -14,4 +14,9 @@ The pre-built HTML, CSS and JavaScript are availabe in the folder 'docs', so the
 ### Command to build specfic simulation
  ```shell
  gulp <simulation_name>
+ ```
+
+### Command to start sev server
+ ```shell
+ gulp dev-<simulation_name>
  ```
