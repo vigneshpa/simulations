@@ -3,13 +3,15 @@
   --color: black;
   --a-color: rgb(18, 99, 206);
   --wheel-filter: none;
+  --shadow: 0px 0px 5px grey;
 }
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: rgb(29, 29, 29);
+    --background: rgb(46, 46, 46);
     --color: white;
     --wheel-filter: invert(80%);
     --a-color: rgb(152, 183, 224);
+    --shadow: 0px 0px 2px white;
   }
 }
 body {
@@ -22,7 +24,7 @@ body {
   -webkit-tap-highlight-color: transparent;
 }
 #header {
-  box-shadow: 0px 0px 4px var(--color);
+  box-shadow: var(--shadow);
   color: var(--color);
   background-color: var(--background);
   position: fixed;
@@ -50,7 +52,7 @@ body {
 }
 
 #controls {
-  box-shadow: 0 0 3px var(--color);
+  box-shadow: var(--shadow);
   border-radius: 1em;
   padding: 1em;
   margin-top: 30px;
@@ -88,7 +90,7 @@ label {
   left: 0px;
   right: 0px;
   padding: 0.3em;
-  box-shadow: 0px 0px 2px var(--color);
+  box-shadow: var(--shadow);
   background-color: var(--background);
   z-index: 1;
 }
