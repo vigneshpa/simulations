@@ -22,7 +22,7 @@ body {
   -webkit-tap-highlight-color: transparent;
 }
 #header {
-  box-shadow: 0px 0px 5px var(--color);
+  box-shadow: 0px 0px 4px var(--color);
   color: var(--color);
   background-color: var(--background);
   position: fixed;

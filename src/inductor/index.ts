@@ -1,28 +1,41 @@
 import './style.css'; // importing style sheet
 
-// Constants
-const inductance = 10; // in Henries(H)
-const resistance = 5; // in Ohms(Ω)
-const sineWaveFrequency = 0.2; // in Hertz (Hz)
-const sineWaveAngularVelocity = 2 * Math.PI * sineWaveFrequency; // in rad/sec as ω=2πf
+const visiblePercision = 1;
+
+// Maximums
 const voltageMax = 10;
 const currentMax = 2;
-const initialInductorCurrent = -voltageMax / (inductance * sineWaveAngularVelocity); // as -I₀=-E₀/Lω
-const angularVelocityCurrentRatio = 1;
-const integrateResistorCurrent = (delta: number) => voltage / resistance; // as V=iR
-const integrateInductorCurrent = (delta: number) => (currentIntegral += (delta * voltage) / inductance); // as V=-L(di/dt)
-const integrateResIndCurrent = (delta: number) => (currentIntegral += (delta * (voltage - currentIntegral * resistance)) / inductance); // as V=-L(di/dt)+iR
+const resistanceMax = 10;
+const inductanceMax = 10;
 
-// Variables
-let integrateCurrent = integrateResistorCurrent;
-let voltage = 0;
-let rps = 0;
-let wheelR: number = 0;
-let currentIntegral: number = 0;
+// Controlables
+const controls = {
+  Voltage: 0, // in Volts (V)
+  Resistance: 5, // in Ohms (Ω)
+  Inductance: 5, // in Henries (H)
+};
+
+// Constants
+const sineWaveFrequency = 0.2; // in Hertz (Hz)
+const sineWaveAngularVelocity = 2 * Math.PI * sineWaveFrequency; // in rad/sec as ω=2πf
+const initialInductorCurrent = () => -voltageMax / (controls.Inductance * sineWaveAngularVelocity); // as -I₀=-E₀/Lω
+const angularVelocityCurrentRatio = 1;
+const integrateResistorCurrent = (delta: number) => controls.Voltage / controls.Resistance; // as V=iR
+const integrateInductorCurrent = (delta: number) => (currentIntegral += (delta * controls.Voltage) / controls.Inductance); // as V=-L(di/dt)
+const integrateResIndCurrent = (delta: number) =>
+  (currentIntegral += (delta * (controls.Voltage - currentIntegral * controls.Resistance)) / controls.Inductance); // as V=-L(di/dt)+iR
+
+// Internal variables
+let currentIntegral: number = 0; // Curent integral in Ampere (A)
+let rps = 0; // Angular velocity in rotations per second
+let wheelR: number = 0; // Wheel angle in turns
 let loadtype: 'Resistive' | 'Inductive' | 'ResInd' | 'InductiveCorrected' = 'Resistive';
 let generateSine: boolean = false;
 let generatorStartTS: number | null = null;
 let previousTS: number = 0;
+
+// integration function variable
+let integrateCurrent = integrateResistorCurrent;
 
 // Adding wheel element
 const wheelEl = document.createElement('img');
@@ -35,7 +48,7 @@ const changeGenerateSine = (checked: boolean) => {
   currentIntegral = 0;
   rps = 0;
   generateSine = !!checked;
-  if (generateSine && loadtype === 'InductiveCorrected') currentIntegral = initialInductorCurrent;
+  if (generateSine && loadtype === 'InductiveCorrected') currentIntegral = initialInductorCurrent();
 };
 
 const changeCircuitType = (loadt: typeof loadtype) => {
@@ -72,54 +85,37 @@ const step: FrameRequestCallback = timeStamp => {
   wheelEl.style.transform = `rotate(${wheelR}deg)`;
 
   // --
-  curEl.innerText = current.toFixed(1);
+  curEl.innerText = current.toFixed(visiblePercision);
   curPgr.value = current + currentMax;
   if (!generatorStartTS) generatorStartTS = timeStamp;
-  if (generateSine)
-    (<any>volEl).innerText = ((<any>voltageInp).value = voltage =
-      voltageMax * Math.sin(((timeStamp - generatorStartTS) * sineWaveAngularVelocity) / 1000)).toFixed(1);
+  if (generateSine) voltageControl.change(voltageMax * Math.sin(((timeStamp - generatorStartTS) * sineWaveAngularVelocity) / 1000));
   previousTS = timeStamp;
   window.requestAnimationFrame(step);
 };
 window.requestAnimationFrame(step);
 
-// Populating controls
+// Populating controls -----
 
 // Shortcut functions
 const br = () => document.createElement('br');
 
 // getting control element
-const controls = document.getElementById('controls')!;
+const controlsDiv = document.getElementById('controls')!;
 
 // Appending current
 const curEl = document.createElement('span');
 curEl.innerText = '0.0';
-controls.append('Current : ', curEl, 'A', br());
+controlsDiv.append('Current : ', curEl, 'A', br());
 
 // Appending current progress
 const curPgr = document.createElement('progress');
 curPgr.max = currentMax * 2;
 curPgr.value = 2;
-controls.append(curPgr, br());
+controlsDiv.append(curPgr, br());
 
-// Appending voltage
-const volEl = document.createElement('span');
-volEl.innerText = '0.0';
-const voltageLablel = document.createElement('label');
-voltageLablel.append('Voltage : ', volEl, 'V');
-voltageLablel.htmlFor = 'voltage';
-controls.append(voltageLablel, br());
-
-// Appending voltage input
-const voltageInp = document.createElement('input');
-voltageInp.id = 'voltage';
-voltageInp.type = 'range';
-voltageInp.max = voltageMax as unknown as string;
-voltageInp.min = -voltageMax as unknown as string;
-voltageInp.step = '0.1';
-voltageInp.value = '0';
-voltageInp.oninput = ev => (volEl.innerText = (voltage = +voltageInp.value).toFixed(1));
-controls.append(voltageInp, br());
+// Appending controls.Voltage
+const voltageControl = createControl('Voltage', voltageMax, -voltageMax, 'V');
+controlsDiv.append(...voltageControl.nodes, br());
 
 // Appending generate sine
 const generateSineInp = document.createElement('input');
@@ -129,7 +125,7 @@ generateSineInp.onchange = ev => changeGenerateSine(generateSineInp.checked);
 const generateSineInpLbl = document.createElement('label');
 generateSineInpLbl.htmlFor = 'generateSine';
 generateSineInpLbl.innerText = `Generate Sine Wave (${sineWaveFrequency}Hz)`;
-controls.append(generateSineInp, generateSineInpLbl, br());
+controlsDiv.append(generateSineInp, generateSineInpLbl, br());
 
 // Appending circuit type selector
 const circuitDiv = document.createElement('div');
@@ -157,13 +153,36 @@ for (const text in handlers) {
     circuitDiv.append(lbl, br());
   }
 }
-controls.append(circuitDiv);
+controlsDiv.append(circuitDiv);
 
-// Appending circuit constants
-const constantsDiv = document.createElement('div');
+// Appending circuit components
+const componentsDiv = document.createElement('div');
 const constantsDivHeading = document.createElement('h4');
-constantsDivHeading.innerText = 'Circuit Constants';
-constantsDiv.append(constantsDivHeading);
-constantsDiv.append(`Inductance : ${inductance}H`, br());
-constantsDiv.append(`Resistance : ${resistance}Ω`, br());
-controls.append(constantsDiv);
+constantsDivHeading.innerText = 'Circuit Components';
+componentsDiv.append(constantsDivHeading);
+
+// Inductance control
+componentsDiv.append(...createControl('Inductance', inductanceMax, 0.1, 'H').nodes);
+
+// I
+
+componentsDiv.append(...createControl('Resistance', resistanceMax, 0.1, 'Ω').nodes);
+controlsDiv.append(componentsDiv);
+
+function createControl(name: keyof typeof controls, max: number, min: number, unitSymbol: string) {
+  const labelEl = document.createElement('label');
+  labelEl.htmlFor = name;
+  const valueEl = document.createElement('span');
+  valueEl.innerText = controls[name] as unknown as string;
+  labelEl.append(name + ' : ', valueEl, unitSymbol);
+  const contorlEL = document.createElement('input');
+  contorlEL.type = 'range';
+  contorlEL.max = max + '';
+  contorlEL.min = min + '';
+  contorlEL.step = '0.1';
+  contorlEL.id = name;
+  const change = (value: number) => (contorlEL.value = (controls[name] = value).toFixed(visiblePercision));
+  change(controls[name]);
+  contorlEL.oninput = ev => (valueEl.innerText = (controls[name] = +contorlEL.value).toFixed(visiblePercision));
+  return { nodes: [labelEl, br(), contorlEL, br()], change };
+}
