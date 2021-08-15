@@ -25,11 +25,19 @@ const integrateInductorCurrent = (delta: number) => (currentIntegral += (delta *
 const integrateResIndCurrent = (delta: number) =>
   (currentIntegral += (delta * (controls.Voltage - currentIntegral * controls.Resistance)) / controls.Inductance); // as V=-L(di/dt)+iR
 
+// Load Type emun
+enum LoadType {
+  Resistive,
+  Inductive,
+  InductiveCorrected,
+  ResInd,
+}
+
 // Internal variables
 let currentIntegral: number = 0; // Curent integral in Ampere (A)
 let rps = 0; // Angular velocity in rotations per second
 let wheelR: number = 0; // Wheel angle in turns
-let loadtype: 'Resistive' | 'Inductive' | 'ResInd' | 'InductiveCorrected' = 'Resistive';
+let loadtype: LoadType = LoadType.Resistive;
 let generateSine: boolean = false;
 let generatorStartTS: number | null = null;
 let previousTS: number = 0;
@@ -48,24 +56,22 @@ const changeGenerateSine = (checked: boolean) => {
   currentIntegral = 0;
   rps = 0;
   generateSine = !!checked;
-  if (generateSine && loadtype === 'InductiveCorrected') currentIntegral = initialInductorCurrent();
+  if (generateSine && loadtype === LoadType.InductiveCorrected) currentIntegral = initialInductorCurrent();
 };
 
-const changeCircuitType = (loadt: typeof loadtype) => {
+const changeCircuitType = (loadt: LoadType) => {
   loadtype = loadt;
   if (generateSine) changeGenerateSine(true);
   switch (loadt) {
-    case 'Resistive':
+    case LoadType.Resistive:
       integrateCurrent = integrateResistorCurrent;
       break;
-    case 'Inductive':
+    case LoadType.Inductive:
+    case LoadType.InductiveCorrected:
       integrateCurrent = integrateInductorCurrent;
       break;
-    case 'ResInd':
+    case LoadType.ResInd:
       integrateCurrent = integrateResIndCurrent;
-      break;
-    case 'InductiveCorrected':
-      integrateCurrent = integrateInductorCurrent;
       break;
     default:
       integrateCurrent = integrateResistorCurrent;
@@ -132,10 +138,10 @@ const circuitDivHeading = document.createElement('h4');
 circuitDivHeading.innerText = 'Select Circuit Type:';
 circuitDiv.append(circuitDivHeading);
 const handlers = {
-  'Pure Resistor': () => changeCircuitType('Resistive'),
-  'Pure Inductor': () => changeCircuitType('Inductive'),
-  'Pure Inductor (initial current corrected)': () => changeCircuitType('InductiveCorrected'),
-  'RL Series Circuit': () => changeCircuitType('ResInd'),
+  'Pure Resistor': () => changeCircuitType(LoadType.Resistive),
+  'Pure Inductor': () => changeCircuitType(LoadType.Inductive),
+  'Pure Inductor (initial current corrected)': () => changeCircuitType(LoadType.InductiveCorrected),
+  'RL Series Circuit': () => changeCircuitType(LoadType.ResInd),
 };
 for (const text in handlers) {
   if (Object.prototype.hasOwnProperty.call(handlers, text)) {
