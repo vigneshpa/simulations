@@ -26,7 +26,7 @@ const integrateResIndCurrent = (delta: number) =>
   (currentIntegral += (delta * (controls.Voltage - currentIntegral * controls.Resistance)) / controls.Inductance); // as V=-L(di/dt)+iR
 
 // Load Type emun
-enum LoadType {
+const enum LoadType {
   Resistive,
   Inductive,
   InductiveCorrected,
