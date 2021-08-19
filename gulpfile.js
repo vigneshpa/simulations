@@ -7,6 +7,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
 const ImageMinimizerPlugin = require('image-minimizer-webpack-plugin');
+const SveltePreprocess = require('svelte-preprocess');
 
 const srcDir = join(__dirname, 'src');
 const distDir = join(__dirname, 'docs');
@@ -17,6 +18,22 @@ const configs = sims.map(sim => ({
   module: {
     rules: [
       {
+        test: /\.svelte$/i,
+        loader: 'svelte-loader',
+        options: {
+          preprocess: SveltePreprocess(),
+          emitCss: true,
+          sourceMap: true,
+        },
+      },
+      {
+        // required to prevent errors from Svelte on Webpack 5+, omit on Webpack 4
+        test: /node_modules\/svelte\/.*\.mjs$/,
+        resolve: {
+          fullySpecified: false,
+        },
+      },
+      {
         test: /\.ts$/i,
         use: 'ts-loader',
       },
@@ -26,7 +43,7 @@ const configs = sims.map(sim => ({
       },
       {
         test: /\.css$/i,
-        use: [MiniCssExtractPlugin.loader, 'css-loader'],
+        use: [MiniCssExtractPlugin.loader, 'css-loader', 'source-map-loader'],
       },
       {
         test: /\.(png|svg|jpg|jpeg|gif)$/i,
@@ -56,8 +73,10 @@ const configs = sims.map(sim => ({
     new HtmlWebpackPlugin({
       inject: 'head',
       scriptLoading: 'defer',
-      template: '!!pug-loader!' + join(srcDir, sim, 'index.pug'),
+      template: join(srcDir, 'index.html'),
       filename: 'index.html',
+      minify: true,
+      title: sim,
     }),
   ],
   output: {
@@ -71,8 +90,8 @@ const configs = sims.map(sim => ({
     contentBase: join(srcDir, sim),
     compress: true,
   },
-  devtool: 'source-map',
   mode: 'production',
+  devtool: 'source-map',
 }));
 
 sims.forEach((sim, index) => task(sim, cb => webpackCompile(configs[index], cb)));
@@ -90,6 +109,7 @@ function webpackCompile(config, cb) {
 function webpackWatch(config, cb) {
   // if (config.devtool) config.devtool = 'eval-source-map';  // Enable this for faster dev builds but css sourcemaps will not work
   if (config.mode) config.mode = 'development';
+  if (config.devtool) config.devtool = 'eval-source-map';
   new DevServer(webpack(config)).listen(
     3000,
     '0.0.0.0',
