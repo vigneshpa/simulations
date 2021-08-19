@@ -73,10 +73,9 @@ const configs = sims.map(sim => ({
     new HtmlWebpackPlugin({
       inject: 'head',
       scriptLoading: 'defer',
-      template: join(srcDir, 'index.html'),
       filename: 'index.html',
       minify: true,
-      title: sim,
+      title: sim.charAt(0).toUpperCase() + sim.slice(1),
     }),
   ],
   output: {
