@@ -89,6 +89,7 @@
 
     // changing wheel angle
     wheelR += rps * delta;
+    if (wheelR < -4 || wheelR > 4) wheelR = wheelR % 1;
     if (!generatorStartTS) generatorStartTS = timeStamp;
     if (generateSine) voltage = voltageMax * Math.sin(((timeStamp - generatorStartTS) * sineWaveAngularVelocity) / 1000);
     previousTS = timeStamp;
@@ -99,16 +100,16 @@
 
 <Template>
   <span slot="header">Visualising Current as angular velocity</span>
-  <span slot="view">
-    <img src={flywheelImg} style="transform:rotate({wheelR}turn)" alt="" />
-  </span>
+  <img slot="view" src={flywheelImg} style="transform:rotate({wheelR}turn)" alt="" />
   <span slot="controls">
     <Progress name="Current" unit="A" value={currentIntegral} max={currentMax} min={-currentMax} />
     <Range name="Voltage" unit="V" bind:value={voltage} min={-voltageMax} max={voltageMax} />
-    <input type="checkbox" bind:checked={generateSine} on:change id="generateSine" />
-    <label for="generateSine">Generate Sine Wave ({sineWaveFrequency}Hz)</label>
     <div>
-      <h4>Select Circuit Type:</h4>
+      <input type="checkbox" bind:checked={generateSine} on:change id="generateSine" />
+      <label for="generateSine">Generate Sine Wave ({sineWaveFrequency}Hz)</label>
+    </div>
+    <h4>Select Circuit Type:</h4>
+    <div>
       {#each circuitTypes as { type, text }}
         <input type="radio" name="circuitType" id={type + 'ltype'} bind:group={loadtype} value={type} />
         <label for={type + 'ltype'}>{text}</label>
