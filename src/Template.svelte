@@ -16,7 +16,7 @@
     :root {
       --background: white;
       --color: black;
-      --a-color: rgb(94, 110, 131);
+      --a-color: rgb(23, 80, 155);
       --image-filter: none;
       --shadow: 0px 0px 5px grey;
     }
@@ -25,7 +25,7 @@
         --background: rgb(46, 46, 46);
         --color: white;
         --image-filter: invert(80%);
-        --a-color: rgb(152, 183, 224);
+        --a-color: rgb(125, 181, 255);
         --shadow: 0px 0px 2px white;
       }
     }
