@@ -47,7 +47,7 @@
   let loadtype: LoadType = LoadType.Resistive; // Type of load
   let generateSine: boolean = false; // weather to generate sine wave
   let generatorStartTS: number | null = null; // sine wave generator start timestap
-  let previousTS: number = 0; // previous timestamp
+  let previousTS: number = performance.now(); // previous timestamp
   let info: string = '';
 
   // integration function variable
@@ -81,7 +81,7 @@
 
   const step: FrameRequestCallback = timeStamp => {
     const delta = (timeStamp - previousTS) / 1000; // calculating delta and converting it to seconds
-    if (delta > 0.25) info = "It looks like you have left this tab or your browser's preformance is slow and this simulation may be inaccurate!";
+    if (delta > 0.5) info = "It looks like you have left this tab or your browser's preformance is slow and this simulation may be inaccurate!";
     if (!generatorStartTS) generatorStartTS = timeStamp;
     if (generateSine) voltage = voltageMax * Math.sin(((timeStamp - generatorStartTS) * sineWaveAngularVelocity) / 1000);
 
