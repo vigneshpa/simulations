@@ -1,8 +1,8 @@
 <script lang="ts">
-  import Template from '../Template.svelte';
-  import Range from '../Range.svelte';
-  import Progress from '../Progress.svelte';
-  import Info from '../Info.svelte';
+  import Template from '@lib/Template.svelte';
+  import Range from '@lib/Range.svelte';
+  import Progress from '@lib/Progress.svelte';
+  import Info from '@lib/Info.svelte';
   const flywheelImg: string = require('./flywheel.svg');
 
   // Maxima

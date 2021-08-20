@@ -31,7 +31,7 @@ The pre-built HTML, CSS and JavaScript are availabe in the folder 'docs', so the
 ## How it is organised
 
 The source code lies within the [src](./src) folder. For each simulation there must be folder for the simulation inside the [src](./src) folder.
-This simulation folder must contain an 'index.ts' file which is the entry point fot the bundler for that simulation. Every folder inside the [src](./src) directory must correspond to a simulation. 
+This simulation folder must contain an 'index.ts' file which is the entry point of the bundler for that simulation. Every folder inside the [src](./src) directory must correspond to a simulation unless the folder is [lib](./src/lib) where a common library for all simulations is seated.
 
 ## How it works
 

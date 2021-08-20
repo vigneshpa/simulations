@@ -4,7 +4,6 @@
     "module": "ES2020",
     "strict": true,
     "esModuleInterop": false,
-    "baseUrl": ".",
     "moduleResolution": "node",
     "importsNotUsedAsValues": "error",
     "sourceMap": true,
@@ -14,10 +13,18 @@
       "DOM",
       "DOM.Iterable",
       "ESNext.Array"
-    ]
+    ],
+    "paths": {
+      "@/*": [
+        "./src/*"
+      ],
+      "@lib/*": [
+        "./src/lib/*"
+      ]
+    }
   },
   "include": [
-    "src/**/*.ts",
-    "typings/**/*.d.ts"
+    "./src/**/*.ts",
+    "./typings/**/*.d.ts"
   ]
 }

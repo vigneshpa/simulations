@@ -1,4 +1,4 @@
-const { readdirSync, statSync, stat } = require('fs');
+const { readdirSync, statSync } = require('fs');
 const { join } = require('path');
 const { task } = require('gulp');
 const webpack = require('webpack');
@@ -12,7 +12,7 @@ const SveltePreprocess = require('svelte-preprocess');
 const srcDir = join(__dirname, 'src');
 const distDir = join(__dirname, 'docs');
 
-const sims = readdirSync(srcDir).filter(sim => statSync(join(srcDir, sim)).isDirectory());
+const sims = readdirSync(srcDir).filter(sim => sim !== 'lib' && statSync(join(srcDir, sim)).isDirectory());
 const configs = sims.map(sim => ({
   entry: join(srcDir, sim, 'index.ts'),
   module: {
@@ -62,6 +62,10 @@ const configs = sims.map(sim => ({
   resolve: { extensions: ['.js', '.jsm', '.ts', '.json'] },
   optimization: {
     minimizer: [`...`, new CssMinimizerPlugin()],
+  },
+  alias: {
+    '@': join(__dirname, 'src'),
+    '@lib': join(__dirname, 'src/lib'),
   },
   plugins: [
     new ImageMinimizerPlugin({
