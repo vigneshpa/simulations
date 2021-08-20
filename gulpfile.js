@@ -14,7 +14,7 @@ const distDir = join(__dirname, 'docs');
 
 const sims = readdirSync(srcDir).filter(sim => sim !== 'lib' && statSync(join(srcDir, sim)).isDirectory());
 const configs = sims.map(sim => ({
-  entry: join(srcDir, sim, 'index.ts'),
+  entry: join('@/', sim, 'index.ts'),
   module: {
     rules: [
       {
@@ -59,13 +59,15 @@ const configs = sims.map(sim => ({
       },
     ],
   },
-  resolve: { extensions: ['.js', '.jsm', '.ts', '.json'] },
+  resolve: {
+    extensions: ['.js', '.jsm', '.ts', '.json'],
+    alias: {
+      '@': join(__dirname, 'src'),
+      '@lib': join(__dirname, 'src/lib'),
+    },
+  },
   optimization: {
     minimizer: [`...`, new CssMinimizerPlugin()],
-  },
-  alias: {
-    '@': join(__dirname, 'src'),
-    '@lib': join(__dirname, 'src/lib'),
   },
   plugins: [
     new ImageMinimizerPlugin({
@@ -90,7 +92,7 @@ const configs = sims.map(sim => ({
     publicPath: './',
   },
   devServer: {
-    contentBase: join(srcDir, sim),
+    contentBase: join('@/', sim),
     compress: true,
   },
   mode: 'production',
