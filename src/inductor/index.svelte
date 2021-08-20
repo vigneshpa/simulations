@@ -21,8 +21,8 @@
   const initialInductorCurrent = () => -(voltageMax / (inductance * sineWaveAngularVelocity)); // as -I₀=-E₀/Lω
   const angularVelocityCurrentRatio = 1;
   const integrateResistorCurrent = (delta: number) => voltage / resistance; // as V=iR
-  const integrateInductorCurrent = (delta: number) => (currentIntegral += (delta * voltage) / inductance); // as V=-L(di/dt)
-  const integrateResIndCurrent = (delta: number) => (currentIntegral += (delta * (voltage - currentIntegral * resistance)) / inductance); // as V=-L(di/dt)+iR
+  const integrateInductorCurrent = (delta: number) => current + (delta * voltage) / inductance; // as V=-L(di/dt)
+  const integrateResIndCurrent = (delta: number) => current + (delta * (voltage - current * resistance)) / inductance; // as V=-L(di/dt)+iR
 
   // Load Type emun
   const enum LoadType {
@@ -41,27 +41,24 @@
   ];
 
   // Internal variables
-  let currentIntegral: number = 0; // Curent integral in Ampere (A)
-  let rps = 0; // Angular velocity in rotations per second
+  let current: number = 0; // Curent integral in Ampere (A)
   let wheelR: number = 0; // Wheel angle in turns
-  let loadtype: LoadType = LoadType.Resistive;
-  let generateSine: boolean = false;
-  let generatorStartTS: number | null = null;
-  let previousTS: number = 0;
+  let loadtype: LoadType = LoadType.Resistive; // Type of load
+  let generateSine: boolean = false; // weather to generate sine wave
+  let generatorStartTS: number | null = null; // sine wave generator start timestap
+  let previousTS: number = 0; // previous timestamp
 
   // integration function variable
   let integrateCurrent = integrateResistorCurrent;
 
   const onGenerateSineChange = (checked: boolean) => {
     generatorStartTS = null;
-    currentIntegral = 0;
-    rps = 0;
+    current = 0;
     generateSine = !!checked;
-    if (generateSine && loadtype === LoadType.InductiveCorrected) currentIntegral = initialInductorCurrent();
+    if (generateSine && loadtype === LoadType.InductiveCorrected) current = initialInductorCurrent();
   };
   $: onGenerateSineChange(generateSine);
   const onLoadChange = (loadt: LoadType) => {
-    loadtype = loadt;
     if (generateSine) onGenerateSineChange(true);
     switch (loadt) {
       case LoadType.Resistive:
@@ -82,16 +79,13 @@
 
   const step: FrameRequestCallback = timeStamp => {
     const delta = (timeStamp - previousTS) / 1000; // calculating delta and converting it to seconds
-
-    currentIntegral = integrateCurrent(delta);
-
-    rps = angularVelocityCurrentRatio * currentIntegral;
-
-    // changing wheel angle
-    wheelR += rps * delta;
-    if (wheelR < -4 || wheelR > 4) wheelR = wheelR % 1;
     if (!generatorStartTS) generatorStartTS = timeStamp;
     if (generateSine) voltage = voltageMax * Math.sin(((timeStamp - generatorStartTS) * sineWaveAngularVelocity) / 1000);
+
+    current = integrateCurrent(delta);
+
+    // changing wheel angle
+    wheelR = (wheelR + angularVelocityCurrentRatio * current * delta) % 1;
     previousTS = timeStamp;
     window.requestAnimationFrame(step);
   };
@@ -102,7 +96,7 @@
   <span slot="header">Visualising Current as angular velocity</span>
   <img slot="view" src={flywheelImg} style="transform:rotate({wheelR}turn)" alt="" />
   <span slot="controls">
-    <Progress name="Current" unit="A" value={currentIntegral} max={currentMax} min={-currentMax} />
+    <Progress name="Current" unit="A" value={current} max={currentMax} min={-currentMax} />
     <Range name="Voltage" unit="V" bind:value={voltage} min={-voltageMax} max={voltageMax} />
     <div>
       <input type="checkbox" bind:checked={generateSine} on:change id="generateSine" />
