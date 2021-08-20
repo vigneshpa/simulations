@@ -1,8 +1,11 @@
 <template>
   <header><slot name="header">Learning physics visually</slot></header>
   <div id="content">
-    <div id="sim"><div id="view"><slot name="view" /></div></div>
-    <div id="controls"><slot name="controls" /></div>
+    <slot name="info" />
+    <div id="responsiveGrid">
+      <div id="sim"><div id="view"><slot name="view" /></div></div>
+      <div id="controls"><slot name="controls" /></div>
+    </div>
   </div>
   <footer>
     <slot name="footer">
@@ -57,15 +60,19 @@
 
   #content {
     margin: 0;
-    margin-top: 100px;
-    margin-bottom: 100px;
+    margin-top: 80px;
+    margin-bottom: 80px;
+  }
+
+  #responsiveGrid {
+    margin: 0;
     padding: 25px;
 
     display: grid;
     grid-template-columns: auto auto;
   }
   @media only screen and (max-width: 1000px) {
-    #content {
+    #responsiveGrid {
       grid-template-columns: auto;
     }
   }

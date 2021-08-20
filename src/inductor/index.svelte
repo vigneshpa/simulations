@@ -2,6 +2,7 @@
   import Template from '../Template.svelte';
   import Range from '../Range.svelte';
   import Progress from '../Progress.svelte';
+  import Info from '../Info.svelte';
   const flywheelImg: string = require('./flywheel.svg');
 
   // Maxima
@@ -18,8 +19,8 @@
   // Constants
   const sineWaveFrequency = 0.2; // in Hertz (Hz)
   const sineWaveAngularVelocity = 2 * Math.PI * sineWaveFrequency; // in rad/sec as ω=2πf
+  const angularVelocityCurrentRatio = 1; // truns per ampere
   const initialInductorCurrent = () => -(voltageMax / (inductance * sineWaveAngularVelocity)); // as -I₀=-E₀/Lω
-  const angularVelocityCurrentRatio = 1;
   const integrateResistorCurrent = (delta: number) => voltage / resistance; // as V=iR
   const integrateInductorCurrent = (delta: number) => current + (delta * voltage) / inductance; // as V=-L(di/dt)
   const integrateResIndCurrent = (delta: number) => current + (delta * (voltage - current * resistance)) / inductance; // as V=-L(di/dt)+iR
@@ -47,6 +48,7 @@
   let generateSine: boolean = false; // weather to generate sine wave
   let generatorStartTS: number | null = null; // sine wave generator start timestap
   let previousTS: number = 0; // previous timestamp
+  let info: string = '';
 
   // integration function variable
   let integrateCurrent = integrateResistorCurrent;
@@ -79,6 +81,7 @@
 
   const step: FrameRequestCallback = timeStamp => {
     const delta = (timeStamp - previousTS) / 1000; // calculating delta and converting it to seconds
+    if (delta > 0.25) info = "It looks like you have left this tab or your browser's preformance is slow and this simulation may be inaccurate!";
     if (!generatorStartTS) generatorStartTS = timeStamp;
     if (generateSine) voltage = voltageMax * Math.sin(((timeStamp - generatorStartTS) * sineWaveAngularVelocity) / 1000);
 
@@ -93,6 +96,7 @@
 </script>
 
 <Template>
+  <Info bind:info slot="info" />
   <span slot="header">Visualising Current as angular velocity</span>
   <img slot="view" src={flywheelImg} style="transform:rotate({wheelR}turn)" alt="" />
   <span slot="controls">

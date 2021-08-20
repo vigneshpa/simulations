@@ -106,7 +106,6 @@ function webpackCompile(config, cb) {
   });
 }
 function webpackWatch(config, cb) {
-  // if (config.devtool) config.devtool = 'eval-source-map';  // Enable this for faster dev builds but css sourcemaps will not work
   if (config.mode) config.mode = 'development';
   if (config.devtool) config.devtool = 'eval-source-map';
   new DevServer(webpack(config)).listen(
