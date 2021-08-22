@@ -1,5 +1,5 @@
 const { readdirSync, statSync } = require('fs');
-const { join } = require('path');
+const { resolve, join } = require('path');
 const { task } = require('gulp');
 const webpack = require('webpack');
 const DevServer = require('webpack-dev-server');
@@ -9,8 +9,8 @@ const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
 const ImageMinimizerPlugin = require('image-minimizer-webpack-plugin');
 const SveltePreprocess = require('svelte-preprocess');
 
-const srcDir = join(__dirname, 'src');
-const distDir = join(__dirname, 'docs');
+const srcDir = resolve('src');
+const distDir = resolve('docs');
 
 const sims = readdirSync(srcDir).filter(sim => sim !== 'lib' && statSync(join(srcDir, sim)).isDirectory());
 const configs = sims.map(sim => ({
@@ -23,7 +23,6 @@ const configs = sims.map(sim => ({
         options: {
           preprocess: SveltePreprocess(),
           emitCss: true,
-          sourceMap: true,
         },
       },
       {
@@ -60,11 +59,13 @@ const configs = sims.map(sim => ({
     ],
   },
   resolve: {
-    extensions: ['.js', '.jsm', '.ts', '.json'],
     alias: {
-      '@': join(__dirname, 'src'),
-      '@lib': join(__dirname, 'src/lib'),
+      '@': resolve('src'),
+      '@lib': resolve('src/lib'),
+      svelte: resolve('node_modules', 'svelte'),
     },
+    mainFields: ['svelte', 'browser', 'module', 'main'],
+    extensions: ['.js', '.mjs', '.ts', '.svelte', '.json'],
   },
   optimization: {
     minimizer: [`...`, new CssMinimizerPlugin()],
