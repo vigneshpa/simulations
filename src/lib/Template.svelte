@@ -40,6 +40,7 @@
       color: var(--color);
       background-color: var(--background);
       -webkit-tap-highlight-color: transparent;
+      line-height: 1.8rem;
     }
     a {
       color: var(--a-color);
