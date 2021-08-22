@@ -10,15 +10,17 @@
   const currentMax = 2;
   const resistanceMax = 10;
   const inductanceMax = 10;
+  const sineWaveFrequencyMax = 1;
 
   // Controlables
   let voltage = 0; // in Volts (V)
   let resistance = 5; // in Ohms (Ω)
   let inductance = 5; // in Henries (H)
+  let sineWaveFrequency = 0.2; // in Hertz (Hz)
+  let sineWaveAngularVelocity = 0;
+  $: sineWaveAngularVelocity = 2 * Math.PI * sineWaveFrequency; // in rad/sec as ω=2πf
 
   // Constants
-  const sineWaveFrequency = 0.2; // in Hertz (Hz)
-  const sineWaveAngularVelocity = 2 * Math.PI * sineWaveFrequency; // in rad/sec as ω=2πf
   const angularVelocityCurrentRatio = 1; // truns per ampere
   const initialInductorCurrent = () => -(voltageMax / (inductance * sineWaveAngularVelocity)); // as -I₀=-E₀/Lω
   const integrateResistorCurrent = (delta: number) => voltage / resistance; // as V=iR
@@ -103,14 +105,15 @@
     <Progress name="Current" unit="A" value={current} max={currentMax} min={-currentMax} />
     <Range name="Voltage" unit="V" bind:value={voltage} min={-voltageMax} max={voltageMax} />
     <div>
-      <input type="checkbox" bind:checked={generateSine} on:change id="generateSine" />
-      <label for="generateSine">Generate Sine Wave ({sineWaveFrequency}Hz)</label>
+      <input type="checkbox" bind:checked={generateSine} on:change id="generateSine" /><label for="generateSine">Generate Sine Wave</label>
+      {#if generateSine}
+        <Range name="Frequency" unit="Hz" bind:value={sineWaveFrequency} min={0.01} max={sineWaveFrequencyMax} />
+      {/if}
     </div>
     <h4>Select Circuit Type:</h4>
     <div>
       {#each circuitTypes as { type, text }}
-        <input type="radio" name="circuitType" id={type + 'ltype'} bind:group={loadtype} value={type} />
-        <label for={type + 'ltype'}>{text}</label>
+        <input type="radio" name="circuitType" id={type + 'ltype'} bind:group={loadtype} value={type} /><label for={type + 'ltype'}>{text}</label>
         <br />
       {/each}
     </div>

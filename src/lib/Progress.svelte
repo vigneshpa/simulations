@@ -19,10 +19,4 @@
     max-width: 300px;
     margin-bottom: 20px;
   }
-  label {
-    padding: 5px 3px;
-    display: inline-block;
-    min-width: 100px;
-    text-align: center;
-  }
 </style>

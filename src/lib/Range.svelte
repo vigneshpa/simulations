@@ -4,11 +4,12 @@
   export let max: number;
   export let name: string;
   export let unit: string;
-  export let step: number = 0.1;
+  export let step: number = max * 0.01;
+  import { slide } from 'svelte/transition';
 </script>
 
 <template>
-  <div>
+  <div transition:slide>
     <label for={name}>{name} : {value.toFixed(2)}{unit}</label><br />
     <input id={name} type="range" bind:value {min} {max} {step} />
   </div>
@@ -19,11 +20,5 @@
     width: 90%;
     max-width: 300px;
     margin-bottom: 20px;
-  }
-  label {
-    padding: 5px 3px;
-    display: inline-block;
-    min-width: 100px;
-    text-align: center;
   }
 </style>

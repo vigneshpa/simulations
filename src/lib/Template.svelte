@@ -40,10 +40,17 @@
       color: var(--color);
       background-color: var(--background);
       -webkit-tap-highlight-color: transparent;
+      line-height: 28px;
       line-height: 1.8rem;
     }
     a {
       color: var(--a-color);
+    }
+    label {
+      padding: 0px 3px;
+      display: inline-block;
+      min-width: 100px;
+      text-align: center;
     }
   }
   header {
