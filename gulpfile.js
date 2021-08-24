@@ -2,7 +2,6 @@ const { readdirSync, statSync } = require('fs');
 const { resolve, join } = require('path');
 const { task } = require('gulp');
 const webpack = require('webpack');
-const DevServer = require('webpack-dev-server');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
@@ -14,7 +13,7 @@ const distDir = resolve('docs');
 
 const sims = readdirSync(srcDir).filter(sim => sim !== 'lib' && statSync(join(srcDir, sim)).isDirectory());
 const configs = sims.map(sim => ({
-  entry: join('@/', sim, 'index.ts'),
+  entry: [join('@/', sim, 'index.ts')],
   module: {
     rules: [
       {
@@ -92,6 +91,7 @@ const configs = sims.map(sim => ({
   devServer: {
     contentBase: join(srcDir, sim),
     compress: true,
+    port: 3000,
   },
   mode: 'production',
   devtool: 'source-map',
@@ -111,12 +111,22 @@ function webpackCompile(config, cb) {
   });
 }
 function webpackWatch(config, cb) {
+  const express = require('express');
   if (config.mode) config.mode = 'development';
   if (config.devtool) config.devtool = 'eval-source-map';
-  new DevServer(webpack(config)).listen(
-    3000,
-    '0.0.0.0',
-    err => (err ? console.error(err) : console.log('Development server is running at port 3000')),
-    config.devServer
-  );
+  config.module.rules[0].options.emitCss = false;
+  config.module.rules[0].options.compilerOptions = { dev: true };
+  config.module.rules[0].options.hotReload = true;
+  config.module.rules[0].options.hotOptions = { preserveLocalState: true };
+  config.plugins.push(new webpack.HotModuleReplacementPlugin());
+  config.entry = ['webpack-hot-middleware/client', ...config.entry];
+
+  const compiler = webpack(config);
+  const devApp = express();
+  devApp.use(require('morgan')('combined'));
+  devApp.use(require('webpack-dev-middleware')(compiler));
+  if (config.devServer.compress) devApp.use(require('compression')());
+  devApp.use(express.static(config.devServer.contentBase));
+  devApp.use(require('webpack-hot-middleware')(compiler));
+  devApp.listen(config.devServer.port, () => console.log(`Developement server is listening on port ${config.devServer.port}!`));
 }

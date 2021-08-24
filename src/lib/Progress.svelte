@@ -4,10 +4,11 @@
   export let max: number;
   export let name: string;
   export let unit: string;
+  export let precision: number = 2;
 </script>
 
 <div>
-  <label for={name}>{name} : {value.toFixed(2)}{unit}</label><br />
+  <label for={name}>{name} : {value.toFixed(precision)}{unit}</label><br />
   <progress id={name} type="range" max={max - min} value={value - min} />
 </div>
 

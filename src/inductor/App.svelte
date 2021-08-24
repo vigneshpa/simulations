@@ -9,19 +9,22 @@
   const voltageMax = 10;
   const currentMax = 2;
   const resistanceMax = 10;
-  const inductanceMax = 10;
-  const sineWaveFrequencyMax = 1;
+  const inductanceMax = 0.05;
+  const sineWaveFrequencyMax = 100;
+  const speedMax = 0.05;
 
   // Controlables
   let voltage = 0; // in Volts (V)
   let resistance = 5; // in Ohms (Ω)
-  let inductance = 5; // in Henries (H)
-  let sineWaveFrequency = 0.2; // in Hertz (Hz)
+  let inductance = 0.02; // in Henries (H)
+  let sineWaveFrequency = 50; // in Hertz (Hz)
   let sineWaveAngularVelocity = 0;
   $: sineWaveAngularVelocity = 2 * Math.PI * sineWaveFrequency; // in rad/sec as ω=2πf
+  let sineWavePhase = 0;
+  let speed = 0.01;
 
   // Constants
-  const angularVelocityCurrentRatio = 1; // truns per ampere
+  const angularVelocityCurrentRatio = 50; // truns per ampere
   const initialInductorCurrent = () => -(voltageMax / (inductance * sineWaveAngularVelocity)); // as -I₀=-E₀/Lω
   const integrateResistorCurrent = (delta: number) => voltage / resistance; // as V=iR
   const integrateInductorCurrent = (delta: number) => current + (delta * voltage) / inductance; // as V=-L(di/dt)
@@ -59,7 +62,10 @@
     generatorStartTS = null;
     current = 0;
     generateSine = !!checked;
-    if (generateSine && loadtype === LoadType.InductiveCorrected) current = initialInductorCurrent();
+    if (generateSine) {
+      sineWavePhase = 0;
+      if (loadtype === LoadType.InductiveCorrected) current = initialInductorCurrent();
+    }
   };
   $: onGenerateSineChange(generateSine);
   const onLoadChange = (loadt: LoadType) => {
@@ -69,10 +75,11 @@
   $: onLoadChange(loadtype);
 
   const step: FrameRequestCallback = timeStamp => {
-    const delta = (timeStamp - previousTS) / 1000; // calculating delta and converting it to seconds
-    if (delta > 0.5) info = "It looks like you have left this tab or your browser's preformance is slow and this simulation may be inaccurate!";
+    const delta = ((timeStamp - previousTS) * speed) / 1000; // calculating delta and converting it to seconds
+    if (timeStamp - previousTS > 500)
+      info = "It looks like you have left this tab or your browser's preformance is slow and this simulation may be inaccurate!";
     if (!generatorStartTS) generatorStartTS = timeStamp;
-    if (generateSine) voltage = voltageMax * Math.sin(((timeStamp - generatorStartTS) * sineWaveAngularVelocity) / 1000);
+    if (generateSine) voltage = voltageMax * Math.sin((sineWavePhase += sineWaveAngularVelocity * delta));
 
     current = integrateCurrent(delta);
 
@@ -94,19 +101,20 @@
     <div>
       <input type="checkbox" bind:checked={generateSine} on:change id="generateSine" /><label for="generateSine">Generate Sine Wave</label>
       {#if generateSine}
-        <Range name="Frequency" unit="Hz" bind:value={sineWaveFrequency} min={0.01} max={sineWaveFrequencyMax} />
+        <Range name="Frequency" unit="Hz" bind:value={sineWaveFrequency} min={1} max={sineWaveFrequencyMax} />
       {/if}
     </div>
-    <h4>Select Circuit Type:</h4>
+    <h4>Select Circuit Type</h4>
     <div>
       {#each circuitTypeInfo as { text }, type}
         <input type="radio" name="circuitType" id={type + 'ltype'} bind:group={loadtype} value={type} /><label for={type + 'ltype'}>{text}</label>
         <br />
       {/each}
     </div>
-    <h3>Circuit Components</h3>
-    <Range name="Inductance" unit="H" bind:value={inductance} min={0.1} max={inductanceMax} />
-    <Range name="Resistance" unit="Ω" bind:value={resistance} min={0.1} max={resistanceMax} />
+    <h3>Controlables</h3>
+    <Range name="Inductance" unit="H" bind:value={inductance} min={inductanceMax * 0.01} max={inductanceMax} milli precision={1} />
+    <Range name="Resistance" unit="Ω" bind:value={resistance} min={resistanceMax * 0.01} max={resistanceMax} precision={1} />
+    <Range name="Speed" unit="x" bind:value={speed} max={speedMax} precision={4} />
   </span>
 </Template>
 
