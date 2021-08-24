@@ -6,12 +6,10 @@
   export let unit: string;
 </script>
 
-<template>
-  <div>
-    <label for={name}>{name} : {value.toFixed(2)}{unit}</label><br />
-    <progress id={name} type="range" max={max - min} value={value - min} />
-  </div>
-</template>
+<div>
+  <label for={name}>{name} : {value.toFixed(2)}{unit}</label><br />
+  <progress id={name} type="range" max={max - min} value={value - min} />
+</div>
 
 <style>
   progress {

@@ -88,10 +88,9 @@ const configs = sims.map(sim => ({
     assetModuleFilename: '[name][ext][query]',
     path: join(distDir, sim),
     clean: true,
-    publicPath: './',
   },
   devServer: {
-    contentBase: join('src', sim),
+    contentBase: join(srcDir, sim),
     compress: true,
   },
   mode: 'production',

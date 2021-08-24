@@ -36,11 +36,11 @@
   }
 
   // Circuit Types
-  const circuitTypes = [
-    { text: 'Pure Resistor', type: LoadType.Resistive },
-    { text: 'Pure Inductor', type: LoadType.Inductive },
-    { text: 'Pure Inductor (initial current corrected)', type: LoadType.InductiveCorrected },
-    { text: 'RL Series Circuit', type: LoadType.ResInd },
+  const circuitTypeInfo: { text: string; integrator: (delta: number) => number }[] = [
+    { text: 'Pure Resistor', integrator: integrateResistorCurrent },
+    { text: 'Pure Inductor', integrator: integrateInductorCurrent },
+    { text: 'Pure Inductor (initial current corrected)', integrator: integrateInductorCurrent },
+    { text: 'RL Series Circuit', integrator: integrateResIndCurrent },
   ];
 
   // Internal variables
@@ -64,20 +64,7 @@
   $: onGenerateSineChange(generateSine);
   const onLoadChange = (loadt: LoadType) => {
     if (generateSine) onGenerateSineChange(true);
-    switch (loadt) {
-      case LoadType.Resistive:
-        integrateCurrent = integrateResistorCurrent;
-        break;
-      case LoadType.Inductive:
-      case LoadType.InductiveCorrected:
-        integrateCurrent = integrateInductorCurrent;
-        break;
-      case LoadType.ResInd:
-        integrateCurrent = integrateResIndCurrent;
-        break;
-      default:
-        integrateCurrent = integrateResistorCurrent;
-    }
+    integrateCurrent = circuitTypeInfo[loadt].integrator;
   };
   $: onLoadChange(loadtype);
 
@@ -112,7 +99,7 @@
     </div>
     <h4>Select Circuit Type:</h4>
     <div>
-      {#each circuitTypes as { type, text }}
+      {#each circuitTypeInfo as { text }, type}
         <input type="radio" name="circuitType" id={type + 'ltype'} bind:group={loadtype} value={type} /><label for={type + 'ltype'}>{text}</label>
         <br />
       {/each}

@@ -8,12 +8,10 @@
   import { slide } from 'svelte/transition';
 </script>
 
-<template>
-  <div transition:slide>
-    <label for={name}>{name} : {value.toFixed(2)}{unit}</label><br />
-    <input id={name} type="range" bind:value {min} {max} {step} />
-  </div>
-</template>
+<div transition:slide>
+  <label for={name}>{name} : {value.toFixed(2)}{unit}</label><br />
+  <input id={name} type="range" bind:value {min} {max} {step} />
+</div>
 
 <style>
   input[type='range'] {

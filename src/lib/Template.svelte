@@ -1,18 +1,16 @@
-<template>
-  <header><slot name="header">Learning physics visually</slot></header>
-  <div id="content">
-    <slot name="info" />
-    <div id="responsiveGrid">
-      <div id="sim"><div id="view"><slot name="view" /></div></div>
-      <div id="controls"><slot name="controls" /></div>
-    </div>
+<header><slot name="header">Learning physics visually</slot></header>
+<div class="content">
+  <slot name="info" />
+  <div class="responsiveGrid">
+    <div class="sim"><div id="view"><slot name="view" /></div></div>
+    <div class="controls"><slot name="controls" /></div>
   </div>
-  <footer>
-    <slot name="footer">
-      source code is avilable at <a href="https://GitHub.com/vigneshpa/simulations" target="_blank">GitHub.com</a>
-    </slot>
-  </footer>
-</template>
+</div>
+<footer>
+  <slot name="footer">
+    source code is avilable at <a href="https://GitHub.com/vigneshpa/simulations" target="_blank">GitHub.com</a>
+  </slot>
+</footer>
 
 <style lang="scss">
   :global {
@@ -66,13 +64,13 @@
     z-index: 2;
   }
 
-  #content {
+  .content {
     margin: 0;
     margin-top: 80px;
     margin-bottom: 80px;
   }
 
-  #responsiveGrid {
+  .responsiveGrid {
     margin: 0;
     padding: 25px;
 
@@ -80,12 +78,12 @@
     grid-template-columns: auto auto;
   }
   @media only screen and (max-width: 1000px) {
-    #responsiveGrid {
+    .responsiveGrid {
       grid-template-columns: auto;
     }
   }
 
-  #controls {
+  .controls {
     box-shadow: var(--shadow);
     border-radius: 1em;
     padding: 1em;
@@ -93,7 +91,7 @@
     z-index: 0;
   }
 
-  #sim {
+  .sim {
     display: flex;
     flex-direction: column;
     justify-content: center;

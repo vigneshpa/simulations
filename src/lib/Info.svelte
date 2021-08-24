@@ -3,14 +3,12 @@
   export let info: string;
 </script>
 
-<template>
-  {#if info}
-    <div transition:slide class="holder">
-      <div class="content">{info}</div>
-      <button class="close" on:click={() => (info = '')}>Close</button>
-    </div>
-  {/if}
-</template>
+{#if info}
+  <div transition:slide class="holder">
+    <div class="content">{info}</div>
+    <button class="close" on:click={() => (info = '')}>Close</button>
+  </div>
+{/if}
 
 <style>
   .holder {
