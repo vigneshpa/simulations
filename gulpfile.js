@@ -62,7 +62,6 @@ const configs = sims.map(sim => ({
     alias: {
       '@': resolve('src'),
       '@lib': resolve('src/lib'),
-      svelte: resolve('node_modules', 'svelte'),
     },
     mainFields: ['svelte', 'browser', 'module', 'main'],
     extensions: ['.js', '.mjs', '.ts', '.svelte', '.json'],
@@ -76,7 +75,7 @@ const configs = sims.map(sim => ({
         plugins: ['svgo'],
       },
     }),
-    new MiniCssExtractPlugin({ filename: 'assets/style.css' }),
+    new MiniCssExtractPlugin(),
     new HtmlWebpackPlugin({
       inject: 'head',
       scriptLoading: 'defer',
@@ -86,14 +85,13 @@ const configs = sims.map(sim => ({
     }),
   ],
   output: {
-    filename: 'assets/bundle.js',
-    assetModuleFilename: 'assets/[name][ext][query]',
+    assetModuleFilename: '[name][ext][query]',
     path: join(distDir, sim),
     clean: true,
     publicPath: './',
   },
   devServer: {
-    contentBase: join('@/', sim),
+    contentBase: join('src', sim),
     compress: true,
   },
   mode: 'production',
@@ -107,8 +105,9 @@ exports.default = buildAll;
 
 function webpackCompile(config, cb) {
   webpack(config, (err, stats) => {
+    if (err) return cb(err);
+
     console.log(stats.toString({ colors: true }));
-    if (err) throw err;
     cb();
   });
 }
