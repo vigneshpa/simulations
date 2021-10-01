@@ -3,7 +3,7 @@
   import Range from '@lib/Range.svelte';
   import Progress from '@lib/Progress.svelte';
   import Info from '@lib/Info.svelte';
-  const flywheelImg: string = require('./flywheel.svg');
+  import flywheelImg from './flywheel.svg';
 
   // Maxima
   const voltageMax = 10;

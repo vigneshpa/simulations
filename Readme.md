@@ -7,6 +7,8 @@ This git repository has some simulations to learn physics visually and it is not
 
 ## Why?
 
+I came upon this idea to create simulations that are ment to explain things rater being accurate, when I am preparing for a presentation on Inductors. I searched the web far and wide but I can't find an easy way to explain the functioning of an inductor ( I have tried animated videos but none of then fits ) so I made this.
+
 There are many softwares for simulations but they are all designed to be used used for prototyping and for testing designs. But the simulations in this repo are different because the are realtime. You can actually see how the components behave and change the parameters while the simulation is running.
 
 ## Build Instructions
